@@ -75,7 +75,7 @@ func applyK8sTemplate(templatePath, namespace string, substitutions map[string]s
 	for key, value := range substitutions {
 		args = append(args, fmt.Sprintf("%s=%s", key, value))
 	}
-	output, err := runCommand(30*time.Second, "/scripts/apply-template.sh", args...)
+	output, err := runCommand(30*time.Second, "scripts/apply-template.sh", args...)
 	if err != nil {
 		log.Printf("Error applying template: %v\nOutput: %s", err, output)
 	}
@@ -146,7 +146,7 @@ func handleDeployment(sconn *SafeConn, payload DeploymentPayload) {
 		"Namespace": namespace,
 		"RepoURL":   payload.RepoURL,
 	}
-	if err := applyK8sTemplate("/templates/test-pod.yaml", namespace, substitutions); err != nil {
+	if err := applyK8sTemplate("../templates/test-pod.yaml", namespace, substitutions); err != nil {
 		sendWebSocketMessage(sconn, "deployment_error", "Failed to deploy test pod: "+err.Error())
 		return
 	}
@@ -159,7 +159,7 @@ func handleDeployment(sconn *SafeConn, payload DeploymentPayload) {
 	}
 
 	// Deploy production pods.
-	if err := applyK8sTemplate("/templates/prod-pod.yaml", namespace, map[string]string{"Namespace": namespace}); err != nil {
+	if err := applyK8sTemplate("../templates/prod-pod.yaml", namespace, map[string]string{"Namespace": namespace}); err != nil {
 		sendWebSocketMessage(sconn, "deployment_error", "Failed to deploy production pods: "+err.Error())
 		return
 	}
